@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4 h-100 mb-2">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-xl-6">
+<div class="card rounded-3 text-black">
+    <div class="row g-0">
+<div class="col-lg-12">
+    <div class="card-body p-md-5 mx-md-4">
+
+      <div class="text-center">
+        <img src="../../static/img/silversurf.png"
+          style="width: 185px;" alt="logo">
+        <h4 class="mt-1 mb-3 pb-1">SilverSurf Member </h4>
+        <h6 class="mt-1 mb-2 pb-1">Crear Cuenta </h6>
+
+      </div>
+
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          <div class="alert alert-danger" role="alert">
+              {{ messages[0] }}. Ir a <a href="{{ url_for('auth.login') }}">login</a>.
+          </div>
+      {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="/security/register">
+        <p >Introduce tus datos</p>
+        <div class="form-outline mb-2">
+            <input type="text" placeholder="nombre" name="name" class="form-control" autofocus=""/>
+          </div>
+  
+
+        <div class="form-outline mb-2">
+          <input type="email" name="email" class="mtb-2 form-control"autofocus=""
+            placeholder="correo electronico" />
+        </div>
+
+        <div class="form-outline mb-4">
+          <input type="password" placeholder="contraseña" name="password" class="form-control" autofocus=""/>
+        </div>
+
+        <div class="text-center pt-1 mb-1 pb-1">
+          <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-2">Registrar</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+    </div>
+</div>
+      </div>
+    </div>
+</div>
+<!--
+<div class="column is-4 is-offset-4">
+    <h3 class="title">Registro</h3>
+    <div class="box">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="notification is-danger">
+                {{ messages[0] }}. Ir a <a href="{{ url_for('auth.login') }}">login</a>.
+            </div>
+        {% endif %}
+        {% endwith %}
+        <form method="POST" action="/security/register">
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="email" name="email" placeholder="Email" autofocus="">
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="text" name="name" placeholder="Nombre" autofocus="">
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="password" name="password" placeholder="Password">
+                </div>
+            </div>
+
+            <button class="button is-block is-info is-large is-fullwidth">Registrar</button>
+        </form>
+    </div>
+</div>
+-->
+{% endblock %}

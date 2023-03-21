@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mt-4 title text-center">
+ Productos
+</h1>
+<div class="row mb-4" >
+    {%for row in productos%}
+    <div class="card mr-5 mt-4" style="width: 20rem;">
+        <img class="card-img-top" src="https://images.photowall.com/products/54675/surfboard.jpg?h=699&q=85" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title">{{row.nombreProducto}}</h5>
+          <p class="card-text">Precio {{row.precio}} <br> Cantidad Disponible {{row.cantidad}}<br> Marca {{row.marca}} </p>
+          <a href="#" class="btn btn-primary">Comprar</a>
+        </div>
+      </div>
+    {%endfor%}
+
+     
+    </div>
+{% endblock %}

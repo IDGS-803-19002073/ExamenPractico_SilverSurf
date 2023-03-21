@@ -1,0 +1,34 @@
+{% extends "base.html" %} 
+ 
+{% block content%}
+  {%from "_macros.html" import render_field%}
+
+  <div class="mt-4 container">
+   <div class="row">
+       <form name="sent" action="/agregar" id="form1" method="POST">
+           <div class="row control-group">
+               <div class="form-group col-xs-12 float-label-form-group controls">
+                   {{render_field(form.nombreProducto,class='form-control')}}
+               </div>
+           </div>
+           <div class="row control-group">
+               <div class="form-group col-xs-12 float-label-form-group controls">
+                   {{render_field(form.precio,class='form-control')}}
+               </div>
+           </div>
+           <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+                {{render_field(form.marca,class='form-control')}}
+            </div>
+        </div>
+           <div class="row control-group">
+               <div class="form-group col-xs-12 float-label-form-group controls">
+                   {{render_field(form.cantidad,class='form-control')}}
+               </div>
+           </div>
+           <input type="submit" class="btn btn-outline-primary" id="reg-alum" name="registra" value="Registrar"/>
+       </form>
+   </div>
+  </div>
+
+{% endblock %}
