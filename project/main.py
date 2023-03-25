@@ -6,12 +6,19 @@ from flask_security import login_required, current_user
 from flask_security.decorators import roles_required
 #Importamos el objeto de la BD desde __init__.py
 from . import db
+import logging
 from . forms import UseForm
 from . models import Producto
 from flask import request
 from flask import redirect, render_template, url_for
 
-
+# productos = Blueprint('productos', _name_, url_prefix='/productos')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler = logging.FileHandler('app.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 main = Blueprint('main',__name__)
 
@@ -42,19 +49,22 @@ def productosMenu():
         productosAll=Producto.query.all()
         return render_template('productos.html',productos=productosAll)
 
-
-
 @main.route("/agregar",methods=['GET','POST'])
 def agregar():
     create_forms=UseForm(request.form)
     if request.method=='POST':
-        product= Producto(nombreProducto=create_forms.nombreProducto.data,
-                       precio=create_forms.precio.data,
-                       marca=create_forms.marca.data,
-                       cantidad=create_forms.cantidad.data)
-        db.session.add(product)
-        db.session.commit()
-        return redirect(url_for('main.profile'))
+        try:
+            product= Producto(nombreProducto=create_forms.nombreProducto.data,
+                        precio=create_forms.precio.data,
+                        marca=create_forms.marca.data,
+                        cantidad=create_forms.cantidad.data)
+            db.session.add(product)
+            db.session.commit()
+            logger.info('Producto agregado por'+current_user.name+' con id '+str(current_user.id))
+            return redirect(url_for('main.profile'))
+        except Exception as e:    
+            logger.error(str(e) + ' Error al agregar producto por '+current_user.name+' con id '+str(current_user.id))
+            flash('Error al agregar producto')
     return render_template('formAgregar.html',form=create_forms)
 
 
@@ -72,17 +82,21 @@ def modificar():
 
 
     if request.method=='POST':
-        id=create_forms.id.data
-        product= db.session.query(Producto).filter(Producto.id==id).first()
-        product.id=create_forms.id.data
-        product.nombreProducto=create_forms.nombreProducto.data
-        product.precio=create_forms.precio.data
-        product.marca=create_forms.marca.data
-        product.cantidad=create_forms.cantidad.data
+        try:
+            id=create_forms.id.data
+            product= db.session.query(Producto).filter(Producto.id==id).first()
+            product.id=create_forms.id.data
+            product.nombreProducto=create_forms.nombreProducto.data
+            product.precio=create_forms.precio.data
+            product.marca=create_forms.marca.data
+            product.cantidad=create_forms.cantidad.data
 
-        db.session.add(product)
-        db.session.commit()
-        return redirect(url_for('main.profile'))
+            db.session.add(product)
+            db.session.commit()
+            logger.info('Producto modificado por '+current_user.name+' con id '+str(current_user.id))
+            return redirect(url_for('main.profile'))
+        except Exception as e:    
+            logger.error(e)
 
     return render_template('modificar.html',form=create_forms)
 
@@ -93,7 +107,9 @@ def eliminar():
         product= db.session.query(Producto).filter(Producto.id==id).first()
         db.session.delete(product)
         db.session.commit()
-        flash("Se ha eliminado el producto")
+        logger.info('Producto eliminado por '+current_user.name+' con id '+str(current_user.id))
+
+        # flash("Se ha eliminado el producto")
         return redirect(url_for('main.profile'))
 
 

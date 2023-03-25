@@ -1,8 +1,8 @@
 #Importamos los módulos a usar de flask
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash,current_app
 #Importamos los módulos de seguridad para las funciones hash
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import logging
 #Importamos el método login_required de flask_security
 from flask_security import login_required
 #Importamos los métodos login_user, logout_user flask_security.utils
@@ -14,6 +14,13 @@ from . models import User
 #Importamos el objeto de la BD y userDataStore desde __init__
 from . import db, userDataStore
 
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler = logging.FileHandler('app.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 #Creamos el BluePrint y establecemos que todas estas rutas deben estar dentro de /security para sobre escribir las vistas por omisión de flask-security.
 #Por lo que ahora las rutas deberán ser /security/login y security/register
 auth = Blueprint('auth', __name__, url_prefix='/security')
@@ -32,17 +39,28 @@ def login_post():
     #Consultamos si existe un usuario ya registrado con el email.
     user = User.query.filter_by(email=email).first()
 
+    if len(email)==0 or len(password)==0:
+        flash('Rellene los campos')
+        logger.warning('Error campos vacios')
+
+        return redirect(url_for('auth.login'))
+
     #Verificamos si el usuario existe
     #Tomamos el password proporcionado por el usuario lo hasheamos, y lo comparamos con el password de la base de datos.
     if not user or not check_password_hash(user.password, password):
     #if not user or not user.password==encrypt_password(password):
         #Si el usuario no existe o no coinciden los passwords
         flash('El usuario y/o la contraseña son incorrectos')
+        # current_app.logger.error('El usuario y/o la contraseña son incorrectos')
+        logger.warning('El usuario y/o la contraseña son incorrectos')
+
         return redirect(url_for('auth.login')) #Si el usuario no existe o el password es incorrecto regresamos a login
     
     #Si llegamos a este punto sabemos que el usuario tiene datos correctos.
     #Creamos una sessión y logueamos al usuario
     login_user(user, remember=remember)
+    # current_app.logger.debug('email: ' + email +' name: ' + user.name+' idUser: ' + str(user.id))
+    logger.info('email: ' + email +' name: ' + user.name+' idUser: ' + str(user.id))
     return redirect(url_for('main.profile'))
 
 
@@ -61,6 +79,9 @@ def register_post():
 
     if user: #Si se encontró un usuario, redireccionamos de regreso a la página de registro
         flash('El correo electrónico ya existe')
+        # current_app.logger.error('El correo electrónico ya existe')
+        logger.warning('El correo electrónico ya existe')
+
         return redirect(url_for('auth.register'))
 
     #Creamos un nuevo usuario con los datos del formulario.
@@ -76,7 +97,6 @@ def register_post():
     #Añadimos el nuevo usuario a la base de datos.
     #db.session.add(new_user)
     db.session.commit()
-
     return redirect(url_for('auth.login'))
 
 

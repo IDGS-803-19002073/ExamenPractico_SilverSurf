@@ -1,8 +1,10 @@
 #Archivo de configuración que tiene la función de crear nuestra aplicación, iniciar la base de datos y registrará nuestros modelos.
 #Importamos el módulo os
+import logging
+
 import os
 #Importamos la clase Flask del módulo flask
-from flask import Flask
+from flask import Flask, current_app
 #Importamos la clase Security y SQLAlchemySessionUserDatastore de flask-security
 from flask_security import Security, SQLAlchemyUserDatastore
 #Importamos la clase SQLAlchemy del módulo flask_sqlalchemy
@@ -14,6 +16,15 @@ db = SQLAlchemy()
 from .models import User, Role
 #Creamos un objeto de la clase SQLAlchemySessionUserDatastore
 userDataStore = SQLAlchemyUserDatastore(db, User, Role)
+
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler = logging.FileHandler('app.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 #Método de inicio de la aplicación
 def create_app():
@@ -35,6 +46,9 @@ def create_app():
     @app.before_first_request
     def create_all():
         db.create_all()
+        # current_app.logger.debug('Inicio de la aplicación')
+        logger.info('Inicio de la aplicación')
+
 
     #Conectando los modelos a fask-security usando SQLAlchemyUserDatastore
     security = Security(app, userDataStore)
